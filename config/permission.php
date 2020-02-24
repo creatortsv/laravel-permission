@@ -2,7 +2,16 @@
 
 return [
 
+    /*
+     * When using the "HasResponsibilities" trait from this package, we need to know which
+     * Namespaces of your models should be used to retrieve model classes.
+     */
+
     'models' => [
+
+        'namespaces' => [
+            'App',
+        ],
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
@@ -69,6 +78,14 @@ return [
          */
 
         'role_has_permissions' => 'role_has_permissions',
+
+        /*
+         * When using the "HasResponsibility" trait from this package, we need to know which
+         * table should be used to retrieve your models responsibilities. We have chosen a
+         * basic default value but you may easily change it to any table you like.
+         */
+
+        'model_has_responsibilities' => 'model_has_responsibilities',
     ],
 
     'column_names' => [
@@ -82,6 +99,17 @@ return [
          */
 
         'model_morph_key' => 'model_id',
+
+        'entity_morph_key' => 'entity_model_id',
+    ],
+
+    'method_names' => [
+
+        /*
+         * Method name for dynamically defining on the source model
+         */
+
+        'method_responsibilities_name' => '_responsibilities',
     ],
 
     /*

@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateResponsibilitiesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        $tableNames = config('permission.table_names');
+        $columnNames = config('permission.column_names');
+
+        Schema::create($tableNames['model_has_responsibilities'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->string('model_type')->index();
+            $table->unsignedBigInteger($columnNames['model_morph_key'])->index();
+            $table->unsignedBigInteger('role_id')->default(0)->index();
+            $table->unsignedBigInteger('permission_id')->default(0)->index();
+            $table->string('entity_model_type')->index();
+            $table->unsignedBigInteger($columnNames['entity_morph_key'])->index();
+
+            $table->primary(['model_type', $columnNames['model_morph_key'], 'permission_id', 'role_id', 'entity_model_type', $columnNames['entity_morph_key']], 'model_permission_role_entity');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        $tableNames = config('permission.table_names');
+
+        Schema::drop($tableNames['model_has_responsibilities']);
+    }
+}

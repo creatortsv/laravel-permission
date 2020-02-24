@@ -20,7 +20,8 @@ class PermissionServiceProvider extends ServiceProvider
             ], 'config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem, 'create_permission_tables'),
+                __DIR__.'/../database/migrations/create_responsibilities_table.php.stub' => $this->getMigrationFileName($filesystem, 'create_responsibilities_table'),
             ], 'migrations');
         }
 
@@ -151,16 +152,18 @@ class PermissionServiceProvider extends ServiceProvider
      * Returns existing migration file if found, else uses the current timestamp.
      *
      * @param Filesystem $filesystem
+     * @param string $name
      * @return string
      */
-    protected function getMigrationFileName(Filesystem $filesystem): string
+    protected function getMigrationFileName(Filesystem $filesystem, string $name): string
     {
         $timestamp = date('Y_m_d_His');
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
-            ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
+            ->flatMap(function ($path) use ($filesystem, $name) {
+                return $filesystem->glob($path.'*_'.$name.'.php');
+            })
+            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$name}.php")
             ->first();
     }
 }
