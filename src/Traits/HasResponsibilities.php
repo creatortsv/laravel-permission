@@ -5,6 +5,7 @@ namespace Spatie\Permission\Traits;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -140,6 +141,36 @@ trait HasResponsibilities
             ->wherePivot('role_id', (int)$role)
             ->wherePivot('permission_id', (int)$permission)
             ->first() !== null;
+    }
+
+    /**
+     * @param string|Role $role
+     * @return HasResponsibilities
+     */
+    public function revokeResponsibilitiesByRole($role): self
+    {
+        if (!($role instanceof Role) && ($role = Role::findByName($role)) !== null) {
+            DB::table(config('permission.table_names.model_has_responsibilities'))
+                ->where('role_id', $role)
+                ->delete();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Permission $permission
+     * @return HasResponsibilities
+     */
+    public function revokeResponsibilitiesByPermission($permission): self
+    {
+        if (!($permission instanceof Permission) && ($permission = Permission::findByName($permission)) !== null) {
+            DB::table(config('permission.table_names.model_has_responsibilities'))
+                ->where('permission_id', $permission)
+                ->delete();
+        }
+
+        return $this;
     }
 
     /**
