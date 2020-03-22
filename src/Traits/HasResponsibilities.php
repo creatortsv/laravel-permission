@@ -60,12 +60,12 @@ trait HasResponsibilities
     public function giveResponsibilityTo($models, string $guard = 'web', $role = null, $permission = null): self
     {
         if ($role !== null) {
-            $role = $role instanceof Role ? $role : Role::findByName($role, $guard);
+            $role = $role instanceof Role? $role : Role::findByName($role, $guard);
             if (!method_exists($this, 'hasRole')) {
                 throw new UnexpectedValueException('Cannot assign role to this model');
             }
 
-            if ($role !== null && !$this->hasRole($role, $guard)) {
+            if ($role !== null && !$this->hasRole($role)) {
                 $this->assignRole([$role]);
             }
         }
