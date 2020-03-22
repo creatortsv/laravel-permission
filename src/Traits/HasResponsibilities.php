@@ -26,8 +26,14 @@ trait HasResponsibilities
      */
     public function __call($method, $parameters)
     {
-        if (!method_exists($this, $method) && ($class = $this->getResponsibilityClass($method)) !== false) {
-            return $this->getResponsibilityRelationShip($class);
+        if (!method_exists($this, $method)) {
+            if (($class = $this->getResponsibilityClass($method)) !== false) {
+                return $this->getResponsibilityRelationShip($class);
+            }
+
+            if (($class = $this->getStaffClass($method)) !== false) {
+                return $this->getStaffRelationShip($class);
+            }
         }
 
         return parent::__call($method, $parameters);
@@ -212,5 +218,40 @@ trait HasResponsibilities
             ->withPivot(['role_id', 'permission_id'])
             ->wherePivot('model_type', get_class($this))
             ->wherePivot('entity_model_type', $targetClass);
+    }
+
+    /**
+     * @param string $method
+     * @return bool|string
+     */
+    private function getStaffClass(string $method)
+    {
+        if (($position = strrpos($method, config('permission.method_names.method_staff_name'))) !== false) {
+            $baseClass = Str::ucfirst(Str::camel(substr($method, 0, $position)));
+            foreach (config('permission.models.namespaces') as $namespace) {
+                if (class_exists($class = $namespace . '\\' . $baseClass)) {
+                    return $class;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $targetClass
+     * @return BelongsToMany
+     */
+    private function getStaffRelationShip(string $targetClass): BelongsToMany
+    {
+        return $this->belongsToMany(
+            $targetClass,
+            config('permission.table_names.model_has_responsibilities'),
+            config('permission.column_names.entity_morph_key'),
+            config('permission.column_names.model_morph_key')
+        )
+            ->withPivot(['role_id', 'permission_id'])
+            ->wherePivot('model_type', $targetClass)
+            ->wherePivot('entity_model_type', get_class($this));
     }
 }

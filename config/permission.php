@@ -106,10 +106,16 @@ return [
     'method_names' => [
 
         /*
-         * Method name for dynamically defining on the source model
+         * Method name for dynamically defining responsibilities relation on the source model
          */
 
         'method_responsibilities_name' => '_responsibilities',
+
+        /*
+         * Method name for dynamically defining staff relation on the source model
+         */
+
+        'method_staff_name' => '_staff',
     ],
 
     /*
