@@ -79,6 +79,8 @@ trait HasResponsibilities
             ->flatten()
             ->each(function (Model $model) use ($role, $permission): void {
                 $this->getResponsibilityRelationShip(get_class($model))
+                    ->wherePivot('role_id', (int)($role ?: new Role)->id)
+                    ->wherePivot('permission_id', (int)($permission ?: new Permission)->id)
                     ->syncWithoutDetaching([$model->id => [
                         'model_type' => get_class($this),
                         'entity_model_type' => get_class($model),
@@ -100,19 +102,19 @@ trait HasResponsibilities
     public function revokeResponsibilityTo($models, string $guard = 'web', $role = null, $permission = null): self
     {
         if ($role !== null && !($role instanceof Role)) {
-            $role = Role::findByName($role, $guard)->id;
+            $role = Role::findByName($role, $guard);
         }
 
         if ($permission !== null && !($permission instanceof Permission)) {
-            $permission = Permission::findByName($permission, $guard)->id;
+            $permission = Permission::findByName($permission, $guard);
         }
 
         collect(!is_array($models) ? [$models] : $models)
             ->flatten()
             ->each(function (Model $model) use ($role, $permission): void {
                 $this->getResponsibilityRelationShip(get_class($model))
-                    ->wherePivot('role_id', (int)$role)
-                    ->wherePivot('permission_id', (int)$permission)
+                    ->wherePivot('role_id', (int)($role ?: new Role)->id)
+                    ->wherePivot('permission_id', (int)($permission ?: new Permission)->id)
                     ->detach([$model->id]);
             });
 
@@ -207,6 +209,7 @@ trait HasResponsibilities
             config('permission.column_names.model_morph_key'),
             config('permission.column_names.entity_morph_key')
         )
+            ->withPivot(['role_id', 'permission_id'])
             ->wherePivot('model_type', get_class($this))
             ->wherePivot('entity_model_type', $targetClass);
     }
